@@ -1,0 +1,1983 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="theme-color" content="#0b1020" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Türkçe Radyo & TV Tablet Medya Merkezi</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@1.5.15/dist/hls.min.js"></script>
+  <style>
+    :root {
+      --bg: #080d1a;
+      --surface: #11182c;
+      --surface-2: #18223d;
+      --surface-3: #202d50;
+      --border: rgba(255, 255, 255, 0.09);
+      --border-strong: rgba(56, 189, 248, 0.35);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --warn: #f59e0b;
+      --danger: #ef4444;
+      --fav: #fbbf24;
+      --radius-lg: 18px;
+      --radius-md: 13px;
+      --radius-sm: 9px;
+      --tap: 48px;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Inter, sans-serif;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    button, input, select, textarea {
+      font-family: inherit;
+      color: inherit;
+    }
+
+    button {
+      cursor: pointer;
+      border: 1px solid var(--border);
+      background: var(--surface-2);
+      border-radius: var(--radius-sm);
+      min-height: var(--tap);
+      padding: 0 14px;
+      font-size: 0.92rem;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 7px;
+      transition: transform 0.12s ease, background 0.16s ease, border-color 0.16s ease;
+    }
+
+    button:active {
+      transform: scale(0.97);
+    }
+
+    button.primary {
+      background: linear-gradient(135deg, #0284c7, #2563eb);
+      border-color: rgba(125, 211, 252, 0.45);
+      color: #fff;
+    }
+
+    button.success {
+      background: rgba(34, 197, 94, 0.18);
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #86efac;
+    }
+
+    button.warn {
+      background: rgba(245, 158, 11, 0.18);
+      border-color: rgba(245, 158, 11, 0.45);
+      color: #fde68a;
+    }
+
+    button.danger {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.42);
+      color: #fca5a5;
+    }
+
+    button.active-pill {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+      color: #e0f2fe;
+    }
+
+    /* Top Header */
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 40;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      background: rgba(8, 13, 26, 0.92);
+      backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-logo {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, #0ea5e9, #6366f1);
+      display: grid;
+      place-items: center;
+      font-size: 1.25rem;
+      font-weight: 800;
+      box-shadow: 0 8px 24px rgba(14, 165, 233, 0.28);
+    }
+
+    .brand h1 {
+      margin: 0;
+      font-size: 1.08rem;
+      letter-spacing: -0.01em;
+    }
+
+    .brand-sub {
+      font-size: 0.78rem;
+      color: var(--muted);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .net-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 9px;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.16);
+      color: #86efac;
+      border: 1px solid rgba(34, 197, 94, 0.35);
+    }
+
+    .net-pill.offline {
+      background: rgba(245, 158, 11, 0.18);
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.4);
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* Main Tablet Grid */
+    .app-shell {
+      display: grid;
+      grid-template-columns: minmax(340px, 430px) 1fr;
+      gap: 16px;
+      padding: 16px;
+      max-width: 1600px;
+      margin: 0 auto;
+      align-items: start;
+    }
+
+    @media (max-width: 980px) {
+      .app-shell {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 16px;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.28);
+    }
+
+    /* Tabs & Controls */
+    .mode-tabs {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+
+    .mode-tab {
+      min-height: 50px;
+      flex-direction: column;
+      gap: 3px;
+      font-size: 0.82rem;
+      padding: 6px 8px;
+    }
+
+    .mode-tab span.icon {
+      font-size: 1.05rem;
+    }
+
+    .search-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .input, .select, .textarea {
+      width: 100%;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 11px 13px;
+      font-size: 0.94rem;
+      color: var(--text);
+      outline: none;
+    }
+
+    .input:focus, .select:focus, .textarea:focus {
+      border-color: var(--accent);
+    }
+
+    .textarea {
+      min-height: 110px;
+      resize: vertical;
+      font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+      font-size: 0.82rem;
+    }
+
+    .filter-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .chip {
+      min-height: 36px;
+      padding: 0 11px;
+      font-size: 0.8rem;
+      border-radius: 999px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      color: var(--muted);
+    }
+
+    .chip.active {
+      background: rgba(56, 189, 248, 0.2);
+      border-color: var(--accent);
+      color: #e0f2fe;
+    }
+
+    /* Channel List */
+    .channel-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      max-height: 68vh;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .channel-card {
+      display: grid;
+      grid-template-columns: 46px 1fr auto;
+      align-items: center;
+      gap: 11px;
+      padding: 11px 12px;
+      background: var(--surface-2);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-md);
+      transition: border-color 0.15s ease, background 0.15s ease;
+    }
+
+    .channel-card:hover {
+      border-color: rgba(255, 255, 255, 0.22);
+    }
+
+    .channel-card.playing {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(37, 99, 235, 0.15));
+      border-color: var(--accent);
+    }
+
+    .ch-badge {
+      width: 46px;
+      height: 46px;
+      border-radius: 12px;
+      background: var(--surface-3);
+      display: grid;
+      place-items: center;
+      font-weight: 800;
+      font-size: 0.82rem;
+      color: #bae6fd;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: center;
+      padding: 2px;
+    }
+
+    .ch-main {
+      min-width: 0;
+      cursor: pointer;
+    }
+
+    .ch-title-row {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+
+    .ch-name {
+      font-weight: 700;
+      font-size: 0.98rem;
+    }
+
+    .status-tag {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 2px 7px;
+      border-radius: 999px;
+      background: rgba(148, 163, 184, 0.15);
+      color: var(--muted);
+    }
+
+    .status-tag.ok {
+      background: rgba(34, 197, 94, 0.18);
+      color: #86efac;
+    }
+
+    .status-tag.special {
+      background: rgba(56, 189, 248, 0.18);
+      color: #7dd3fc;
+    }
+
+    .status-tag.err {
+      background: rgba(239, 68, 68, 0.18);
+      color: #fca5a5;
+    }
+
+    .ch-meta {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 3px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .ch-actions {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .icon-btn {
+      min-width: 38px;
+      min-height: 38px;
+      padding: 0 8px;
+      font-size: 0.88rem;
+      border-radius: 10px;
+    }
+
+    .icon-btn.fav-active {
+      color: var(--fav);
+      border-color: rgba(251, 191, 36, 0.45);
+      background: rgba(251, 191, 36, 0.12);
+    }
+
+    /* Player Stage */
+    .player-stage {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .now-playing-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .now-title {
+      margin: 0;
+      font-size: 1.3rem;
+    }
+
+    .now-sub {
+      color: var(--muted);
+      font-size: 0.86rem;
+      margin-top: 2px;
+    }
+
+    .source-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .viewport-box {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      min-height: 260px;
+      max-height: 58vh;
+      background: #040711;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    video, audio, iframe.stream-frame {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      background: #040711;
+    }
+
+    .radio-card-stage {
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background: radial-gradient(circle at top, rgba(56, 189, 248, 0.16), rgba(8, 13, 26, 0.96) 72%);
+      gap: 14px;
+    }
+
+    .radio-disc {
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0284c7, #7c3aed);
+      display: grid;
+      place-items: center;
+      font-size: 2.2rem;
+      box-shadow: 0 0 36px rgba(56, 189, 248, 0.28);
+    }
+
+    .bridge-banner {
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.32);
+      border-radius: var(--radius-md);
+      padding: 12px 14px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      font-size: 0.88rem;
+    }
+
+    .controls-strip {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      background: var(--surface-2);
+      padding: 10px 12px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border);
+    }
+
+    .controls-group {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .volume-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      min-width: 150px;
+    }
+
+    input[type="range"] {
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    /* Manager / Local Section */
+    .manager-box {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+
+    @media (max-width: 640px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+    }
+
+    .form-field.full {
+      grid-column: 1 / -1;
+    }
+
+    .form-field label {
+      font-size: 0.8rem;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .toast {
+      position: fixed;
+      bottom: 18px;
+      right: 18px;
+      z-index: 90;
+      background: #0f172a;
+      border: 1px solid var(--accent);
+      color: #f8fafc;
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+      font-size: 0.9rem;
+      max-width: 380px;
+      display: none;
+    }
+
+    .toast.show {
+      display: block;
+    }
+
+    .muted {
+      color: var(--muted);
+      font-size: 0.84rem;
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-logo">TV</div>
+      <div>
+        <h1>Türkçe Radyo &amp; TV Tablet Merkezi</h1>
+        <div class="brand-sub">
+          <span id="netStatus" class="net-pill">● Çevrimiçi</span>
+          <span id="activeCounter">Hazır</span>
+          <span id="sleepBadge"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button id="checkAllBtn" class="success" type="button">🔄 Yayın Kontrol</button>
+      <button id="openManagerBtn" class="primary" type="button">➕ Kanal Ekle / Düzenle</button>
+      <button id="sleepBtn" type="button">⏱️ Uyku Modu</button>
+      <button id="resetAllBtn" class="danger" type="button">↺ Varsayılan</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <!-- Left Column: Channels & Manager/Local -->
+    <section class="panel" aria-label="Kanal Listesi ve Yönetim">
+      <div class="mode-tabs" role="tablist">
+        <button class="mode-tab active-pill" data-tab="tv" type="button">
+          <span class="icon">📺</span>
+          <span>TV Kanalları</span>
+        </button>
+        <button class="mode-tab" data-tab="radio" type="button">
+          <span class="icon">📻</span>
+          <span>Radyolar</span>
+        </button>
+        <button class="mode-tab" data-tab="manage" type="button">
+          <span class="icon">🔗</span>
+          <span>Link Yöneticisi</span>
+        </button>
+        <button class="mode-tab" data-tab="local" type="button">
+          <span class="icon">💾</span>
+          <span>Çevrimdışı</span>
+        </button>
+      </div>
+
+      <div id="channelBrowser">
+        <div class="search-row">
+          <input id="searchInput" class="input" type="search" placeholder="Kanal veya radyo ara..." />
+          <button id="clearSearchBtn" type="button" title="Aramayı Temizle">✕</button>
+        </div>
+
+        <div class="filter-bar">
+          <button class="chip active" data-filter="all" type="button">Tümü</button>
+          <button class="chip" data-filter="fav" type="button">⭐ Favoriler</button>
+          <button class="chip" data-filter="custom" type="button">🔗 Özel Linkler</button>
+          <button class="chip" data-filter="ok" type="button">✅ Aktif Olanlar</button>
+        </div>
+
+        <div id="channelList" class="channel-list"></div>
+      </div>
+
+      <!-- Custom Channel Add / Edit / Import / Export Manager -->
+      <div id="managerView" class="manager-box" style="display:none;">
+        <div>
+          <h2 id="formTitle" style="margin:0 0 4px 0; font-size:1.08rem;">Özel TV / Radyo Kanalı Ekle</h2>
+          <div class="muted">Kendi HLS (.m3u8), radyo akış (.mp3/.aac) veya canlı yayın linklerini ekleyip düzenleyebilirsin.</div>
+        </div>
+
+        <form id="channelForm" class="form-grid">
+          <input type="hidden" id="editChannelId" />
+
+          <div class="form-field">
+            <label for="chNameInput">Kanal / Radyo Adı *</label>
+            <input id="chNameInput" class="input" type="text" required placeholder="Örn: Özel Haber TV veya Yerel FM" />
+          </div>
+
+          <div class="form-field">
+            <label for="chTypeInput">Yayın Türü *</label>
+            <select id="chTypeInput" class="select">
+              <option value="tv">📺 TV Kanalı</option>
+              <option value="radio">📻 Radyo İstasyonu</option>
+            </select>
+          </div>
+
+          <div class="form-field full">
+            <label for="chUrlInput">Ana Yayın Linki (.m3u8 / Ses Akışı / Sayfa URL) *</label>
+            <input id="chUrlInput" class="input" type="url" required placeholder="https://ornek-yayin.com/canli/index.m3u8" />
+          </div>
+
+          <div class="form-field">
+            <label for="chFallbackInput">Yedek Yayın Linki (Opsiyonel)</label>
+            <input id="chFallbackInput" class="input" type="url" placeholder="https://yedek-sunucu.com/stream.m3u8" />
+          </div>
+
+          <div class="form-field">
+            <label for="chCatInput">Kategori</label>
+            <input id="chCatInput" class="input" type="text" placeholder="Örn: Haber, Müzik, Spor, Özel" />
+          </div>
+
+          <div class="form-field full" style="display:flex; flex-direction:row; flex-wrap:wrap; gap:8px; margin-top:4px;">
+            <button type="submit" class="primary" id="saveChannelBtn">💾 Kaydet</button>
+            <button type="button" class="success" id="testFormUrlBtn">▶ Linki Anında Test Et</button>
+            <button type="button" id="cancelEditBtn">Temizle / Vazgeç</button>
+          </div>
+        </form>
+
+        <hr style="width:100%; border:0; border-top:1px solid var(--border); margin:4px 0;" />
+
+        <div class="form-field">
+          <label for="m3uImportArea">Toplu M3U / M3U8 Listesi İçe Aktar veya JSON Yedekle</label>
+          <textarea id="m3uImportArea" class="textarea" placeholder="#EXTM3U&#10;#EXTINF:-1 tvg-name=&quot;Örnek TV&quot;,Örnek TV&#10;https://ornek.com/yayin.m3u8"></textarea>
+        </div>
+
+        <div style="display:flex; flex-wrap:wrap; gap:8px;">
+          <button type="button" class="primary" id="importM3uBtn">📥 M3U / Metin İçe Aktar</button>
+          <button type="button" id="exportCustomBtn">📤 Özel Kanalları Dışa Aktar</button>
+          <button type="button" class="danger" id="clearCustomBtn">🗑️ Tüm Özel Kanalları Sil</button>
+        </div>
+      </div>
+
+      <!-- Offline / Local Media Player View -->
+      <div id="localView" class="manager-box" style="display:none;">
+        <div>
+          <h2 style="margin:0 0 4px 0; font-size:1.08rem;">İnternetsiz Yerel Medya Oynatıcı</h2>
+          <div class="muted">İnternet bağlantısı olmadığında tabletindeki video (MP4, WebM) ve ses (MP3, WAV, OGG, M4A) dosyalarını oynat.</div>
+        </div>
+
+        <label class="primary" style="min-height:52px; border-radius:12px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px; font-weight:700;">
+          📂 Cihazdan Ses / Video Dosyası Seç
+          <input id="localFileInput" type="file" accept="audio/*,video/*" multiple style="display:none;" />
+        </label>
+
+        <div id="localPlaylist" class="channel-list" style="max-height:45vh;">
+          <div class="muted" style="padding:12px; text-align:center;">Henüz yerel dosya seçilmedi.</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Right Column: Player Stage -->
+    <section class="panel player-stage" aria-label="Medya Oynatıcı">
+      <div class="now-playing-header">
+        <div>
+          <h2 id="nowTitle" class="now-title">Bir Kanal veya Radyo Seçin</h2>
+          <div id="nowSub" class="now-sub">Sol listeden yayına dokunarak oynatmaya başlayabilirsin.</div>
+        </div>
+
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="editCurrentBtn" type="button">✏️ Linki Düzenle</button>
+          <button id="favCurrentBtn" type="button">☆ Favorile</button>
+        </div>
+      </div>
+
+      <div class="source-bar">
+        <button id="srcPrimaryBtn" class="active-pill" type="button">Kaynak 1: Ana Akış</button>
+        <button id="srcFallbackBtn" type="button">Kaynak 2: Yedek Akış</button>
+        <button id="srcEmbedBtn" type="button">Kaynak 3: Gömülü Pencere</button>
+        <button id="openExternalBtn" class="warn" type="button">↗ Harici / Tam Sayfa Aç</button>
+      </div>
+
+      <div id="viewportBox" class="viewport-box">
+        <video id="videoPlayer" playsinline controls style="display:none;"></video>
+        <iframe
+          id="embedFrame"
+          class="stream-frame"
+          style="display:none;"
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share; fullscreen"
+          referrerpolicy="no-referrer-when-downgrade"
+        ></iframe>
+        <div id="radioStage" class="radio-card-stage" style="display:none;">
+          <div id="radioDisc" class="radio-disc">📻</div>
+          <div id="radioStationName" style="font-size:1.35rem; font-weight:800;">Radyo İstasyonu</div>
+          <div id="radioHint" class="muted">Ses akışı oynatılıyor...</div>
+          <audio id="audioPlayer" controls style="width:100%; max-width:440px;"></audio>
+        </div>
+        <div id="idleStage" class="radio-card-stage">
+          <div style="font-size:2.4rem;">📡</div>
+          <div style="font-size:1.15rem; font-weight:700;">Tablet Yayın Ekranı Hazır</div>
+          <div class="muted" style="max-width:420px;">
+            Türkçe TV ve radyo listesini kullanabilir, "Link Yöneticisi" sekmesinden kendi yayın linklerini ekleyebilir veya "Çevrimdışı" sekmesinden cihazındaki dosyaları açabilirsin.
+          </div>
+        </div>
+      </div>
+
+      <div id="bridgeBanner" class="bridge-banner" style="display:none;">
+        <span id="bridgeText">Yayın akışında tarayıcı/CORS engeli algılandı.</span>
+        <div style="display:flex; gap:8px; flex-wrap:wrap;">
+          <button id="tryEmbedBridgeBtn" class="primary" type="button">Pencerede Dene</button>
+          <button id="nextWorkingBtn" class="success" type="button">⏭ Sonraki Çalışan</button>
+          <button id="openExternalBannerBtn" class="warn" type="button">↗ Harici Aç</button>
+        </div>
+      </div>
+
+      <div class="controls-strip">
+        <div class="controls-group">
+          <button id="playPauseBtn" class="primary" type="button">▶ Oynat / Duraklat</button>
+          <button id="stopBtn" type="button">⏹ Durdur</button>
+          <button id="prevBtn" type="button">⏮ Önceki</button>
+          <button id="nextBtn" type="button">⏭ Sonraki</button>
+        </div>
+
+        <div class="controls-group">
+          <div class="volume-wrap">
+            <span>🔊</span>
+            <input id="volumeSlider" type="range" min="0" max="1" step="0.02" value="0.85" />
+            <span id="volumeLabel" class="muted">85%</span>
+          </div>
+          <button id="fullscreenBtn" type="button">⛶ Tam Ekran</button>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      const STORAGE_KEY = "tr_tablet_media_center_v1";
+
+      const DEFAULT_CHANNELS = [
+        // Türkçe TV Kanalları
+        {
+          id: "tv-trt-haber",
+          name: "TRT Haber",
+          type: "tv",
+          category: "Haber",
+          url: "https://tv-trthaber.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trthaber-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: true,
+          custom: false
+        },
+        {
+          id: "tv-trt-1",
+          name: "TRT 1",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://tv-trt1.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trt1-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: true,
+          custom: false
+        },
+        {
+          id: "tv-trt-spor",
+          name: "TRT Spor",
+          type: "tv",
+          category: "Spor",
+          url: "https://tv-trtspor1.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trtspor1-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-spor-yildiz",
+          name: "TRT Spor Yıldız",
+          type: "tv",
+          category: "Spor",
+          url: "https://tv-trtspor2.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trtspor2-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-cocuk",
+          name: "TRT Çocuk",
+          type: "tv",
+          category: "Çocuk",
+          url: "https://tv-trtcocuk.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trtcocuk-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-belgesel",
+          name: "TRT Belgesel",
+          type: "tv",
+          category: "Belgesel",
+          url: "https://tv-trtbelgesel.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trtbelgesel-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-turk",
+          name: "TRT Türk",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://tv-trtturk.medya.trt.com.tr/master.m3u8",
+          fallback: "https://tv-trtturk-live.medya.trt.com.tr/master.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-kurdi",
+          name: "TRT Kurdi",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://tv-trtkurdi.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-avaz",
+          name: "TRT Avaz",
+          type: "tv",
+          category: "Kültür",
+          url: "https://tv-trtavaz.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-trt-muzik",
+          name: "TRT Müzik",
+          type: "tv",
+          category: "Müzik",
+          url: "https://tv-trtmuzik.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-atv",
+          name: "ATV",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.atv.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.atv.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-show",
+          name: "Show TV",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.showtv.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.showtv.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-star",
+          name: "Star TV",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.startv.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.startv.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-kanald",
+          name: "Kanal D",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.kanald.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.kanald.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-now",
+          name: "NOW",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.nowtv.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.nowtv.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "tv-tv8",
+          name: "TV8",
+          type: "tv",
+          category: "Ulusal",
+          url: "https://www.tv8.com.tr/canli-yayin",
+          fallback: "",
+          embedUrl: "https://www.tv8.com.tr/canli-yayin",
+          fav: false,
+          custom: false
+        },
+
+        // Türkçe Radyolar
+        {
+          id: "rad-trt-fm",
+          name: "TRT FM",
+          type: "radio",
+          category: "Karma",
+          url: "https://radio-trtfm.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: true,
+          custom: false
+        },
+        {
+          id: "rad-trt-radyo1",
+          name: "TRT Radyo 1",
+          type: "radio",
+          category: "Haber / Kültür",
+          url: "https://radio-trtradyo1.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-trt-nagme",
+          name: "TRT Nağme",
+          type: "radio",
+          category: "TSM",
+          url: "https://radio-trtnagme.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-trt-turku",
+          name: "TRT Türkü",
+          type: "radio",
+          category: "THM",
+          url: "https://radio-trtturku.medya.trt.com.tr/master.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-kral-pop",
+          name: "Kral Pop",
+          type: "radio",
+          category: "Pop",
+          url: "https://kralpopwmp.radyotvonline.com/",
+          fallback: "https://ssldyg.radyotvonline.com/kralpop/playlist.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-kral-fm",
+          name: "Kral FM",
+          type: "radio",
+          category: "Arabesk / Fantazi",
+          url: "https://kralwmp.radyotvonline.com/",
+          fallback: "https://ssldyg.radyotvonline.com/kralfm/playlist.m3u8",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-super-fm",
+          name: "Süper FM",
+          type: "radio",
+          category: "Pop",
+          url: "https://listen.radyofenomen.com/superfm/128/icecast.audio",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-joyturk",
+          name: "JoyTürk",
+          type: "radio",
+          category: "Slow / Pop",
+          url: "https://playerservices.streamtheworld.com/api/livestream-redirect/JOY_TURKAAC.aac",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-slow-turk",
+          name: "Slow Türk",
+          type: "radio",
+          category: "Slow",
+          url: "https://radyo.duhnet.tv/slowturk",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-best-fm",
+          name: "Best FM",
+          type: "radio",
+          category: "Karma",
+          url: "https://bestfm.radyotvonline.com/",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-alem-fm",
+          name: "Alem FM",
+          type: "radio",
+          category: "Karma",
+          url: "https://turkmedya.radyotvonline.com/alemfm/playlist.m3u8",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-powerturk",
+          name: "PowerTürk",
+          type: "radio",
+          category: "Pop",
+          url: "https://listen.powerapp.com.tr/powerturk/mpeg/icecast.audio",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        },
+        {
+          id: "rad-fenomen",
+          name: "Radyo Fenomen",
+          type: "radio",
+          category: "Yabancı / Hit",
+          url: "https://listen.radyofenomen.com/fenomen/128/icecast.audio",
+          fallback: "",
+          embedUrl: "",
+          fav: false,
+          custom: false
+        }
+      ];
+
+      let state = loadState();
+      let activeTab = "tv"; // 'tv' | 'radio' | 'manage' | 'local'
+      let activeFilter = "all"; // 'all' | 'fav' | 'custom' | 'ok'
+      let searchQuery = "";
+      let currentChannelId = null;
+      let currentSourceMode = "primary"; // 'primary' | 'fallback' | 'embed'
+      let hlsInstance = null;
+      let localFiles = [];
+      let currentLocalIdx = -1;
+      let sleepTimerId = null;
+      let sleepEndTime = null;
+      let sleepIntervalId = null;
+
+      // DOM elements
+      const netStatus = document.getElementById("netStatus");
+      const activeCounter = document.getElementById("activeCounter");
+      const sleepBadge = document.getElementById("sleepBadge");
+      const checkAllBtn = document.getElementById("checkAllBtn");
+      const openManagerBtn = document.getElementById("openManagerBtn");
+      const sleepBtn = document.getElementById("sleepBtn");
+      const resetAllBtn = document.getElementById("resetAllBtn");
+
+      const channelBrowser = document.getElementById("channelBrowser");
+      const managerView = document.getElementById("managerView");
+      const localView = document.getElementById("localView");
+      const searchInput = document.getElementById("searchInput");
+      const clearSearchBtn = document.getElementById("clearSearchBtn");
+      const channelListEl = document.getElementById("channelList");
+
+      const channelForm = document.getElementById("channelForm");
+      const formTitle = document.getElementById("formTitle");
+      const editChannelId = document.getElementById("editChannelId");
+      const chNameInput = document.getElementById("chNameInput");
+      const chTypeInput = document.getElementById("chTypeInput");
+      const chUrlInput = document.getElementById("chUrlInput");
+      const chFallbackInput = document.getElementById("chFallbackInput");
+      const chCatInput = document.getElementById("chCatInput");
+      const testFormUrlBtn = document.getElementById("testFormUrlBtn");
+      const cancelEditBtn = document.getElementById("cancelEditBtn");
+      const m3uImportArea = document.getElementById("m3uImportArea");
+      const importM3uBtn = document.getElementById("importM3uBtn");
+      const exportCustomBtn = document.getElementById("exportCustomBtn");
+      const clearCustomBtn = document.getElementById("clearCustomBtn");
+
+      const localFileInput = document.getElementById("localFileInput");
+      const localPlaylistEl = document.getElementById("localPlaylist");
+
+      const nowTitle = document.getElementById("nowTitle");
+      const nowSub = document.getElementById("nowSub");
+      const editCurrentBtn = document.getElementById("editCurrentBtn");
+      const favCurrentBtn = document.getElementById("favCurrentBtn");
+
+      const srcPrimaryBtn = document.getElementById("srcPrimaryBtn");
+      const srcFallbackBtn = document.getElementById("srcFallbackBtn");
+      const srcEmbedBtn = document.getElementById("srcEmbedBtn");
+      const openExternalBtn = document.getElementById("openExternalBtn");
+
+      const videoPlayer = document.getElementById("videoPlayer");
+      const embedFrame = document.getElementById("embedFrame");
+      const radioStage = document.getElementById("radioStage");
+      const radioStationName = document.getElementById("radioStationName");
+      const radioHint = document.getElementById("radioHint");
+      const audioPlayer = document.getElementById("audioPlayer");
+      const idleStage = document.getElementById("idleStage");
+
+      const bridgeBanner = document.getElementById("bridgeBanner");
+      const bridgeText = document.getElementById("bridgeText");
+      const tryEmbedBridgeBtn = document.getElementById("tryEmbedBridgeBtn");
+      const nextWorkingBtn = document.getElementById("nextWorkingBtn");
+      const openExternalBannerBtn = document.getElementById("openExternalBannerBtn");
+
+      const playPauseBtn = document.getElementById("playPauseBtn");
+      const stopBtn = document.getElementById("stopBtn");
+      const prevBtn = document.getElementById("prevBtn");
+      const nextBtn = document.getElementById("nextBtn");
+      const volumeSlider = document.getElementById("volumeSlider");
+      const volumeLabel = document.getElementById("volumeLabel");
+      const fullscreenBtn = document.getElementById("fullscreenBtn");
+      const viewportBox = document.getElementById("viewportBox");
+      const toastEl = document.getElementById("toast");
+
+      function loadState() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (Array.isArray(parsed.channels) && parsed.channels.length) {
+              return {
+                channels: parsed.channels,
+                statuses: parsed.statuses || {},
+                volume: typeof parsed.volume === "number" ? parsed.volume : 0.85
+              };
+            }
+          }
+        } catch (e) {}
+        return {
+          channels: structuredClone(DEFAULT_CHANNELS),
+          statuses: {},
+          volume: 0.85
+        };
+      }
+
+      function saveState() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        } catch (e) {}
+      }
+
+      function showToast(msg) {
+        toastEl.textContent = msg;
+        toastEl.classList.add("show");
+        clearTimeout(showToast._t);
+        showToast._t = setTimeout(() => toastEl.classList.remove("show"), 3200);
+      }
+
+      function updateNetworkBadge() {
+        const online = navigator.onLine;
+        netStatus.textContent = online ? "● Çevrimiçi" : "⚠ Çevrimdışı Mod";
+        netStatus.className = online ? "net-pill" : "net-pill offline";
+      }
+
+      function getFilteredChannels() {
+        const listType = activeTab === "radio" ? "radio" : "tv";
+        const q = searchQuery.trim().toLowerCase();
+
+        return state.channels
+          .filter((ch) => {
+            if (activeTab === "tv" || activeTab === "radio") {
+              if (ch.type !== listType) return false;
+            }
+            if (activeFilter === "fav" && !ch.fav) return false;
+            if (activeFilter === "custom" && !ch.custom) return false;
+            if (activeFilter === "ok") {
+              const st = state.statuses[ch.id];
+              if (!st || (st !== "ok" && st !== "special")) return false;
+            }
+            if (q) {
+              const hay = `${ch.name} ${ch.category || ""} ${ch.url}`.toLowerCase();
+              if (!hay.includes(q)) return false;
+            }
+            return true;
+          })
+          .sort((a, b) => {
+            if (a.fav !== b.fav) return a.fav ? -1 : 1;
+            return 0;
+          });
+      }
+
+      function renderChannelList() {
+        const items = getFilteredChannels();
+        const okCount = Object.values(state.statuses).filter((v) => v === "ok" || v === "special").length;
+        activeCounter.textContent = `Aktif: ${okCount}/${state.channels.length} kanal`;
+
+        if (!items.length) {
+          channelListEl.innerHTML = `<div class="muted" style="padding:18px; text-align:center;">Bu filtreye uygun kanal bulunamadı.</div>`;
+          return;
+        }
+
+        channelListEl.innerHTML = items
+          .map((ch) => {
+            const isPlaying = ch.id === currentChannelId;
+            const st = state.statuses[ch.id];
+            let badgeHtml = `<span class="status-tag">Kontrol Edilmedi</span>`;
+            if (st === "ok") badgeHtml = `<span class="status-tag ok">Aktif</span>`;
+            else if (st === "special") badgeHtml = `<span class="status-tag special">Canlı Sayfa / Özel</span>`;
+            else if (st === "err") badgeHtml = `<span class="status-tag err">Erişilemedi</span>`;
+
+            const shortLabel = ch.name
+              .replace(/TRT\s*/i, "")
+              .slice(0, 4)
+              .toUpperCase();
+
+            return `
+              <div class="channel-card ${isPlaying ? "playing" : ""}" data-id="${ch.id}">
+                <div class="ch-badge">${escapeHtml(shortLabel)}</div>
+                <div class="ch-main" data-play="${ch.id}">
+                  <div class="ch-title-row">
+                    <span class="ch-name">${escapeHtml(ch.name)}</span>
+                    ${badgeHtml}
+                    ${ch.custom ? `<span class="status-tag special">Özel</span>` : ""}
+                  </div>
+                  <div class="ch-meta">${escapeHtml(ch.category || (ch.type === "tv" ? "TV" : "Radyo"))} • ${escapeHtml(ch.url)}</div>
+                </div>
+                <div class="ch-actions">
+                  <button class="icon-btn ${ch.fav ? "fav-active" : ""}" data-fav="${ch.id}" title="Favori" type="button">${ch.fav ? "★" : "☆"}</button>
+                  <button class="icon-btn" data-edit="${ch.id}" title="Düzenle" type="button">✏️</button>
+                  ${ch.custom ? `<button class="icon-btn" data-del="${ch.id}" title="Sil" type="button">🗑️</button>` : ""}
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      function escapeHtml(str) {
+        return String(str || "")
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;");
+      }
+
+      function destroyHls() {
+        if (hlsInstance) {
+          hlsInstance.destroy();
+          hlsInstance = null;
+        }
+      }
+
+      function stopAllMedia() {
+        destroyHls();
+        videoPlayer.pause();
+        videoPlayer.removeAttribute("src");
+        videoPlayer.load();
+        audioPlayer.pause();
+        audioPlayer.removeAttribute("src");
+        audioPlayer.load();
+        embedFrame.src = "about:blank";
+      }
+
+      function hideStages() {
+        videoPlayer.style.display = "none";
+        embedFrame.style.display = "none";
+        radioStage.style.display = "none";
+        idleStage.style.display = "none";
+        bridgeBanner.style.display = "none";
+      }
+
+      function getCurrentChannel() {
+        return state.channels.find((c) => c.id === currentChannelId) || null;
+      }
+
+      function isWebPageUrl(url) {
+        if (!url) return false;
+        const lower = url.toLowerCase();
+        if (lower.includes(".m3u8") || lower.includes(".mp3") || lower.includes(".aac") || lower.includes("icecast") || lower.includes("streamtheworld")) {
+          return false;
+        }
+        return lower.startsWith("http://") || lower.startsWith("https://");
+      }
+
+      function playChannel(channelId, mode = "primary") {
+        const ch = state.channels.find((c) => c.id === channelId);
+        if (!ch) return;
+
+        currentChannelId = ch.id;
+        currentLocalIdx = -1;
+        currentSourceMode = mode;
+
+        if (ch.type === "tv" && activeTab === "radio") {
+          switchTab("tv");
+        } else if (ch.type === "radio" && activeTab === "tv") {
+          switchTab("radio");
+        }
+
+        nowTitle.textContent = ch.name;
+        nowSub.textContent = `${ch.type === "tv" ? "TV Kanalı" : "Radyo İstasyonu"} • ${ch.category || "Genel"}`;
+        favCurrentBtn.textContent = ch.fav ? "★ Favoride" : "☆ Favorile";
+        favCurrentBtn.className = ch.fav ? "icon-btn fav-active" : "";
+
+        srcPrimaryBtn.classList.toggle("active-pill", mode === "primary");
+        srcFallbackBtn.classList.toggle("active-pill", mode === "fallback");
+        srcEmbedBtn.classList.toggle("active-pill", mode === "embed");
+
+        srcFallbackBtn.disabled = !ch.fallback;
+        srcEmbedBtn.disabled = !(ch.embedUrl || isWebPageUrl(ch.url));
+
+        let targetUrl = ch.url;
+        if (mode === "fallback" && ch.fallback) targetUrl = ch.fallback;
+        if (mode === "embed") targetUrl = ch.embedUrl || ch.url;
+
+        stopAllMedia();
+        hideStages();
+
+        if (!navigator.onLine) {
+          idleStage.style.display = "flex";
+          showBridge("İnternet bağlantısı yok. 'Çevrimdışı' sekmesinden cihazdaki dosyaları açabilirsin.", targetUrl);
+          renderChannelList();
+          return;
+        }
+
+        if (mode === "embed" || (ch.type === "tv" && isWebPageUrl(targetUrl))) {
+          embedFrame.style.display = "block";
+          embedFrame.src = targetUrl;
+          state.statuses[ch.id] = "special";
+          saveState();
+          showBridge("Resmi yayın sayfası oynatıcı penceresinde açıldı. Site gömmeyi engellerse harici pencerede açabilirsin.", targetUrl);
+          renderChannelList();
+          return;
+        }
+
+        if (ch.type === "tv") {
+          videoPlayer.style.display = "block";
+          videoPlayer.volume = state.volume;
+          startHlsOrNative(videoPlayer, targetUrl, ch);
+        } else {
+          radioStage.style.display = "flex";
+          radioStationName.textContent = ch.name;
+          radioHint.textContent = targetUrl;
+          audioPlayer.volume = state.volume;
+          startHlsOrNative(audioPlayer, targetUrl, ch);
+        }
+
+        renderChannelList();
+      }
+
+      function startHlsOrNative(mediaEl, url, ch) {
+        const isHls = url.toLowerCase().includes(".m3u8");
+
+        if (isHls && window.Hls && window.Hls.isSupported()) {
+          hlsInstance = new window.Hls({ enableWorker: true, lowLatencyMode: true });
+          hlsInstance.loadSource(url);
+          hlsInstance.attachMedia(mediaEl);
+          hlsInstance.on(window.Hls.Events.MANIFEST_PARSED, function () {
+            mediaEl.play().catch(() => {});
+            state.statuses[ch.id] = "ok";
+            saveState();
+            renderChannelList();
+          });
+          hlsInstance.on(window.Hls.Events.ERROR, function (_ev, data) {
+            if (data && data.fatal) {
+              handleStreamFailure(ch, url);
+            }
+          });
+        } else {
+          mediaEl.src = url;
+          mediaEl.play().then(() => {
+            state.statuses[ch.id] = "ok";
+            saveState();
+            renderChannelList();
+          }).catch(() => {
+            handleStreamFailure(ch, url);
+          });
+          mediaEl.onerror = function () {
+            handleStreamFailure(ch, url);
+          };
+        }
+      }
+
+      function handleStreamFailure(ch, failedUrl) {
+        if (currentSourceMode === "primary" && ch.fallback && ch.fallback !== failedUrl) {
+          showToast("Ana akış yanıt vermedi, yedek akış deneniyor...");
+          playChannel(ch.id, "fallback");
+          return;
+        }
+
+        state.statuses[ch.id] = "err";
+        saveState();
+        renderChannelList();
+
+        const bridgeTarget = ch.embedUrl || ch.url;
+        showBridge("Bu akış tarayıcıda oynatılamadı (CORS/bağlantı kısıtı veya yayın kapalı olabilir).", bridgeTarget);
+      }
+
+      function showBridge(message, extUrl) {
+        bridgeText.textContent = message;
+        bridgeBanner.style.display = "flex";
+        openExternalBannerBtn.dataset.url = extUrl || "";
+        openExternalBtn.dataset.url = extUrl || "";
+      }
+
+      async function checkAllChannels() {
+        if (!navigator.onLine) {
+          showToast("Çevrimdışı modda yayın kontrolü yapılamaz.");
+          return;
+        }
+        checkAllBtn.disabled = true;
+        checkAllBtn.textContent = "⏳ Kontrol Ediliyor...";
+
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4500);
+
+        await Promise.all(
+          state.channels.map(async (ch) => {
+            if (isWebPageUrl(ch.url) || ch.embedUrl) {
+              state.statuses[ch.id] = "special";
+              return;
+            }
+            try {
+              await fetch(ch.url, { mode: "no-cors", signal: controller.signal });
+              state.statuses[ch.id] = "ok";
+            } catch (e) {
+              state.statuses[ch.id] = "err";
+            }
+          })
+        );
+
+        clearTimeout(timeout);
+        saveState();
+        renderChannelList();
+        checkAllBtn.disabled = false;
+        checkAllBtn.textContent = "🔄 Yayın Kontrol";
+        showToast("Yayın durumları güncellendi.");
+      }
+
+      function switchTab(tab) {
+        activeTab = tab;
+        document.querySelectorAll(".mode-tab").forEach((btn) => {
+          btn.classList.toggle("active-pill", btn.dataset.tab === tab);
+        });
+
+        channelBrowser.style.display = tab === "tv" || tab === "radio" ? "block" : "none";
+        managerView.style.display = tab === "manage" ? "flex" : "none";
+        localView.style.display = tab === "local" ? "flex" : "none";
+
+        if (tab === "tv" || tab === "radio") {
+          renderChannelList();
+        }
+      }
+
+      function startEditChannel(channelId) {
+        const ch = state.channels.find((c) => c.id === channelId);
+        if (!ch) return;
+
+        switchTab("manage");
+        formTitle.textContent = `"${ch.name}" Kanalını Düzenle`;
+        editChannelId.value = ch.id;
+        chNameInput.value = ch.name;
+        chTypeInput.value = ch.type;
+        chUrlInput.value = ch.url;
+        chFallbackInput.value = ch.fallback || "";
+        chCatInput.value = ch.category || "";
+      }
+
+      function resetForm() {
+        editChannelId.value = "";
+        formTitle.textContent = "Özel TV / Radyo Kanalı Ekle";
+        channelForm.reset();
+      }
+
+      function parseM3uText(text) {
+        const lines = text.split(/\r?\n/).map((l) => l.trim()).filter(Boolean);
+        const added = [];
+        let pendingName = "";
+        let pendingType = "tv";
+        let pendingCat = "Özel Liste";
+
+        for (const line of lines) {
+          if (line.startsWith("#EXTINF")) {
+            const groupMatch = line.match(/group-title="([^"]+)"/i);
+            if (groupMatch) {
+              pendingCat = groupMatch[1];
+              if (pendingCat.toLowerCase().includes("radio") || pendingCat.toLowerCase().includes("radyo")) {
+                pendingType = "radio";
+              }
+            }
+            const commaIdx = line.lastIndexOf(",");
+            if (commaIdx !== -1) {
+              pendingName = line.slice(commaIdx + 1).trim();
+            }
+          } else if (!line.startsWith("#") && /^https?:\/\//i.test(line)) {
+            const lower = line.toLowerCase();
+            const isAudio = lower.includes(".mp3") || lower.includes(".aac") || lower.includes("icecast") || lower.includes("radio");
+            const type = pendingType === "radio" || isAudio ? "radio" : "tv";
+            const name = pendingName || `Özel Yayın ${added.length + 1}`;
+            added.push({
+              id: "custom-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+              name,
+              type,
+              category: pendingCat,
+              url: line,
+              fallback: "",
+              embedUrl: "",
+              fav: false,
+              custom: true
+            });
+            pendingName = "";
+            pendingType = "tv";
+            pendingCat = "Özel Liste";
+          }
+        }
+        return added;
+      }
+
+      function handleLocalFiles(files) {
+        localFiles = Array.from(files || []);
+        if (!localFiles.length) {
+          localPlaylistEl.innerHTML = `<div class="muted" style="padding:12px; text-align:center;">Dosya seçilmedi.</div>`;
+          return;
+        }
+
+        localPlaylistEl.innerHTML = localFiles
+          .map((file, idx) => {
+            const mb = (file.size / (1024 * 1024)).toFixed(1);
+            return `
+              <div class="channel-card ${idx === currentLocalIdx ? "playing" : ""}" data-local-idx="${idx}">
+                <div class="ch-badge">${file.type.startsWith("video/") ? "MP4" : "MP3"}</div>
+                <div class="ch-main">
+                  <div class="ch-name">${escapeHtml(file.name)}</div>
+                  <div class="ch-meta">Yerel Dosya • ${mb} MB</div>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+
+        playLocalIndex(0);
+      }
+
+      function playLocalIndex(idx) {
+        const file = localFiles[idx];
+        if (!file) return;
+        currentLocalIdx = idx;
+        currentChannelId = null;
+        stopAllMedia();
+        hideStages();
+
+        const objectUrl = URL.createObjectURL(file);
+        nowTitle.textContent = file.name;
+        nowSub.textContent = "Çevrimdışı Yerel Dosya";
+
+        if (file.type.startsWith("video/")) {
+          videoPlayer.style.display = "block";
+          videoPlayer.src = objectUrl;
+          videoPlayer.volume = state.volume;
+          videoPlayer.play().catch(() => {});
+        } else {
+          radioStage.style.display = "flex";
+          radioStationName.textContent = file.name;
+          radioHint.textContent = "Cihaz hafızasından çevrimdışı çalınıyor";
+          audioPlayer.style.display = "block";
+          audioPlayer.src = objectUrl;
+          audioPlayer.volume = state.volume;
+          audioPlayer.play().catch(() => {});
+        }
+
+        handleLocalFiles(localFiles);
+      }
+
+      function stepChannel(dir) {
+        const list = getFilteredChannels();
+        if (!list.length) return;
+        const idx = list.findIndex((c) => c.id === currentChannelId);
+        const nextIdx = idx === -1 ? 0 : (idx + dir + list.length) % list.length;
+        playChannel(list[nextIdx].id, "primary");
+      }
+
+      function toggleSleepTimer() {
+        if (sleepTimerId) {
+          clearTimeout(sleepTimerId);
+          clearInterval(sleepIntervalId);
+          sleepTimerId = null;
+          sleepEndTime = null;
+          sleepBadge.textContent = "";
+          showToast("Uyku zamanlayıcısı iptal edildi.");
+          return;
+        }
+
+        const choice = prompt("Kaç dakika sonra oynatıcı kapansın? (15, 30, 60 veya iptal için 0)", "30");
+        const mins = parseInt(choice, 10);
+        if (!mins || mins <= 0) return;
+
+        sleepEndTime = Date.now() + mins * 60 * 1000;
+        sleepTimerId = setTimeout(() => {
+          stopAllMedia();
+          hideStages();
+          idleStage.style.display = "flex";
+          sleepTimerId = null;
+          sleepEndTime = null;
+          sleepBadge.textContent = "";
+          showToast("Uyku zamanlayıcısı doldu, yayın durduruldu.");
+        }, mins * 60 * 1000);
+
+        clearInterval(sleepIntervalId);
+        sleepIntervalId = setInterval(() => {
+          if (!sleepEndTime) return;
+          const remMs = Math.max(0, sleepEndTime - Date.now());
+          const remMin = Math.ceil(remMs / 60000);
+          sleepBadge.textContent = `⏱️ ${remMin} dk kaldı`;
+        }, 15000);
+
+        sleepBadge.textContent = `⏱️ ${mins} dk kaldı`;
+        showToast(`${mins} dakikalık uyku zamanlayıcısı ayarlandı.`);
+      }
+
+      // Events
+      window.addEventListener("online", updateNetworkBadge);
+      window.addEventListener("offline", updateNetworkBadge);
+
+      document.querySelectorAll(".mode-tab").forEach((btn) => {
+        btn.addEventListener("click", () => switchTab(btn.dataset.tab));
+      });
+
+      openManagerBtn.addEventListener("click", () => {
+        resetForm();
+        switchTab("manage");
+      });
+
+      checkAllBtn.addEventListener("click", checkAllChannels);
+      sleepBtn.addEventListener("click", toggleSleepTimer);
+
+      resetAllBtn.addEventListener("click", () => {
+        if (!confirm("Varsayılan Türkçe TV ve radyo listesine dönülsün mü? (Özel kanallar silinir)")) return;
+        localStorage.removeItem(STORAGE_KEY);
+        state = loadState();
+        stopAllMedia();
+        hideStages();
+        idleStage.style.display = "flex";
+        currentChannelId = null;
+        renderChannelList();
+        showToast("Varsayılan listeye dönüldü.");
+      });
+
+      searchInput.addEventListener("input", (e) => {
+        searchQuery = e.target.value;
+        renderChannelList();
+      });
+
+      clearSearchBtn.addEventListener("click", () => {
+        searchInput.value = "";
+        searchQuery = "";
+        renderChannelList();
+      });
+
+      document.querySelectorAll(".chip").forEach((chip) => {
+        chip.addEventListener("click", () => {
+          activeFilter = chip.dataset.filter;
+          document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("active", c === chip));
+          renderChannelList();
+        });
+      });
+
+      channelListEl.addEventListener("click", (e) => {
+        const playBtn = e.target.closest("[data-play]");
+        if (playBtn) {
+          playChannel(playBtn.dataset.play, "primary");
+          return;
+        }
+        const favBtn = e.target.closest("[data-fav]");
+        if (favBtn) {
+          const ch = state.channels.find((c) => c.id === favBtn.dataset.fav);
+          if (ch) {
+            ch.fav = !ch.fav;
+            saveState();
+            renderChannelList();
+            if (ch.id === currentChannelId) {
+              favCurrentBtn.textContent = ch.fav ? "★ Favoride" : "☆ Favorile";
+            }
+          }
+          return;
+        }
+        const editBtn = e.target.closest("[data-edit]");
+        if (editBtn) {
+          startEditChannel(editBtn.dataset.edit);
+          return;
+        }
+        const delBtn = e.target.closest("[data-del]");
+        if (delBtn) {
+          const id = delBtn.dataset.del;
+          state.channels = state.channels.filter((c) => c.id !== id);
+          if (currentChannelId === id) {
+            currentChannelId = null;
+            stopAllMedia();
+            hideStages();
+            idleStage.style.display = "flex";
+          }
+          saveState();
+          renderChannelList();
+          showToast("Özel kanal silindi.");
+        }
+      });
+
+      channelForm.addEventListener("submit", (e) => {
+        e.preventDefault();
+        const name = chNameInput.value.trim();
+        const type = chTypeInput.value;
+        const url = chUrlInput.value.trim();
+        const fallback = chFallbackInput.value.trim();
+        const category = chCatInput.value.trim() || (type === "tv" ? "Özel TV" : "Özel Radyo");
+
+        if (!name || !url) return;
+
+        const existingId = editChannelId.value;
+        if (existingId) {
+          const idx = state.channels.findIndex((c) => c.id === existingId);
+          if (idx !== -1) {
+            state.channels[idx] = {
+              ...state.channels[idx],
+              name,
+              type,
+              url,
+              fallback,
+              category,
+              custom: true
+            };
+            delete state.statuses[existingId];
+            saveState();
+            showToast(`"${name}" güncellendi.`);
+            switchTab(type);
+            playChannel(existingId, "primary");
+          }
+        } else {
+          const newCh = {
+            id: "custom-" + Date.now(),
+            name,
+            type,
+            url,
+            fallback,
+            embedUrl: "",
+            category,
+            fav: false,
+            custom: true
+          };
+          state.channels.unshift(newCh);
+          saveState();
+          showToast(`"${name}" listeye eklendi.`);
+          resetForm();
+          switchTab(type);
+          playChannel(newCh.id, "primary");
+        }
+      });
+
+      testFormUrlBtn.addEventListener("click", () => {
+        const name = chNameInput.value.trim() || "Test Yayını";
+        const type = chTypeInput.value;
+        const url = chUrlInput.value.trim();
+        const fallback = chFallbackInput.value.trim();
+        if (!url) {
+          showToast("Önce bir yayın linki girin.");
+          return;
+        }
+        const tempId = "__test_channel__";
+        state.channels = state.channels.filter((c) => c.id !== tempId);
+        state.channels.unshift({
+          id: tempId,
+          name,
+          type,
+          url,
+          fallback,
+          embedUrl: "",
+          category: "Test",
+          fav: false,
+          custom: true
+        });
+        playChannel(tempId, "primary");
+        showToast("Test yayını oynatıcıda başlatıldı.");
+      });
+
+      cancelEditBtn.addEventListener("click", resetForm);
+
+      importM3uBtn.addEventListener("click", () => {
+        const raw = m3uImportArea.value.trim();
+        if (!raw) {
+          showToast("İçe aktarılacak M3U veya bağlantı listesi girin.");
+          return;
+        }
+        const parsed = parseM3uText(raw);
+        if (!parsed.length) {
+          showToast("Geçerli http/https yayın bağlantısı bulunamadı.");
+          return;
+        }
+        state.channels = [...parsed, ...state.channels];
+        saveState();
+        renderChannelList();
+        m3uImportArea.value = "";
+        showToast(`${parsed.length} adet yayın içe aktarıldı.`);
+      });
+
+      exportCustomBtn.addEventListener("click", () => {
+        const customs = state.channels.filter((c) => c.custom);
+        if (!customs.length) {
+          showToast("Dışa aktarılacak özel kanal bulunmuyor.");
+          return;
+        }
+        m3uImportArea.value = JSON.stringify(customs, null, 2);
+        showToast("Özel kanallar JSON olarak metin alanına yazıldı.");
+      });
+
+      clearCustomBtn.addEventListener("click", () => {
+        if (!confirm("Eklediğiniz tüm özel kanallar silinsin mi?")) return;
+        state.channels = state.channels.filter((c) => !c.custom);
+        saveState();
+        renderChannelList();
+        showToast("Özel kanallar temizlendi.");
+      });
+
+      localFileInput.addEventListener("change", (e) => handleLocalFiles(e.target.files));
+      localPlaylistEl.addEventListener("click", (e) => {
+        const card = e.target.closest("[data-local-idx]");
+        if (card) playLocalIndex(parseInt(card.dataset.localIdx, 10));
+      });
+
+      editCurrentBtn.addEventListener("click", () => {
+        if (currentChannelId) startEditChannel(currentChannelId);
+        else showToast("Düzenlemek için önce bir kanal seçin.");
+      });
+
+      favCurrentBtn.addEventListener("click", () => {
+        const ch = getCurrentChannel();
+        if (!ch) return;
+        ch.fav = !ch.fav;
+        saveState();
+        renderChannelList();
+        favCurrentBtn.textContent = ch.fav ? "★ Favoride" : "☆ Favorile";
+      });
+
+      srcPrimaryBtn.addEventListener("click", () => currentChannelId && playChannel(currentChannelId, "primary"));
+      srcFallbackBtn.addEventListener("click", () => currentChannelId && playChannel(currentChannelId, "fallback"));
+      srcEmbedBtn.addEventListener("click", () => currentChannelId && playChannel(currentChannelId, "embed"));
+
+      function openUrl(url) {
+        if (!url) {
+          showToast("Açılacak bağlantı bulunamadı.");
+          return;
+        }
+        window.open(url, "_blank", "noopener,noreferrer");
+      }
+
+      openExternalBtn.addEventListener("click", () => {
+        const ch = getCurrentChannel();
+        openUrl(openExternalBtn.dataset.url || (ch && ch.url));
+      });
+
+      openExternalBannerBtn.addEventListener("click", () => {
+        openUrl(openExternalBannerBtn.dataset.url);
+      });
+
+      tryEmbedBridgeBtn.addEventListener("click", () => {
+        if (currentChannelId) playChannel(currentChannelId, "embed");
+      });
+
+      nextWorkingBtn.addEventListener("click", () => stepChannel(1));
+
+      playPauseBtn.addEventListener("click", () => {
+        const activeEl = videoPlayer.style.display !== "none" ? videoPlayer : audioPlayer;
+        if (!activeEl.src) {
+          const list = getFilteredChannels();
+          if (list.length) playChannel(list[0].id, "primary");
+          return;
+        }
+        if (activeEl.paused) activeEl.play().catch(() => {});
+        else activeEl.pause();
+      });
+
+      stopBtn.addEventListener("click", () => {
+        stopAllMedia();
+        hideStages();
+        idleStage.style.display = "flex";
+      });
+
+      prevBtn.addEventListener("click", () => stepChannel(-1));
+      nextBtn.addEventListener("click", () => stepChannel(1));
+
+      volumeSlider.value = state.volume;
+      volumeLabel.textContent = `${Math.round(state.volume * 100)}%`;
+      volumeSlider.addEventListener("input", (e) => {
+        const v = parseFloat(e.target.value);
+        state.volume = v;
+        volumeLabel.textContent = `${Math.round(v * 100)}%`;
+        videoPlayer.volume = v;
+        audioPlayer.volume = v;
+        saveState();
+      });
+
+      fullscreenBtn.addEventListener("click", () => {
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(() => {});
+        } else if (viewportBox.requestFullscreen) {
+          viewportBox.requestFullscreen().catch(() => {});
+        }
+      });
+
+      // Init
+      updateNetworkBadge();
+      renderChannelList();
+    })();
+  </script>
+</body>
+</html>
